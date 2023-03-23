@@ -4,21 +4,25 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 class Book
 {
     private:
         unsigned int id;
-        string tittle;
-        string author;
+        std::string tittle;
+        std::string author;
         unsigned long ISBN;
-        string genre;
-        bool loaned;
+        std::string genre;
+        bool checkedOut;
     public:
-        //Constructors        
-        Book(unsigned int bookId, string bookTittle, string bookAuthor, unsigned long ISBN);
+        //Constructors
+        Book() = delete;
+        Book(unsigned int bookId, std::string bookTittle, std::string bookAuthor, unsigned long ISBN);
+        Book(const Book&) = delete;
+        
+        void operator=(const Book&) = delete;
         
         void printBookInfo() const;
+        void chcekOutBook();
+        void returnBook();
 };
 #endif
