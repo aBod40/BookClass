@@ -1,6 +1,19 @@
 #include "Book.h"
 
-Book::Book(unsigned int bookId, std::string bookTittle, std::string bookAuthor, unsigned long ISBN){}
+Book::Book(unsigned int bookId, std::string bookTittle, std::string bookAuthor, unsigned long ISBN)
+{
+    if (bookTittle.empty())
+    {
+        throw "Book tiitle must be specified";
+    }
+    
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, std::optional<T> const& opt)
+{
+    return opt ? os << opt.value() : os;
+}
 
 void Book::printBookInfo() const
 {
@@ -10,8 +23,21 @@ void Book::printBookInfo() const
     <<"Author: "<<author<<"\n"
     <<"ISBN: "<<ISBN<<"\n"
     <<"Genre: "<<genre<<"\n"
-    <<"Checked out: "<<checkedOut<<"\n\n";
+    <<"Checked out: "<<(checkedOut ? "Book is currently checkedout:" : "Book is currently not checkedout")<<"\n"
+    <<"Checkedout to: "<<checkedOutToPerson<<"\n\n";
 }
 
-void Book::chcekOutBook() { checkedOut = true; }
+void Book::checkOutBook(std::string person)
+{
+    if (!checkedOut)
+    {
+        checkedOut = true;
+        checkedOutToPerson = person;
+    }
+}
+
 void Book::returnBook() { checkedOut = false; }
+
+void Book::printByAuthor(std::string authorName, std::vector<Book> bookList)
+{
+}
