@@ -27,7 +27,7 @@ class Book
         std::vector<std::string> authors;
         std::array<ushort, isbnSize> isbn = {0};
         GenreE genre;
-        ushort loanPeriod = 1;
+        ushort loanPeriod = 10; // number of days
         bool checkedOut = false;
         std::optional<std::string> checkedOutToPerson = std::nullopt;
         std::optional<std::chrono::time_point<std::chrono::system_clock>> checkoutDate = std::nullopt;
@@ -40,8 +40,11 @@ class Book
         Book(const Book&) = delete;
         Book(Book&&) = default;
 
+        // Operators
         Book& operator= (const Book&) = delete;
         Book& operator= (Book&& ) = default;
+        bool operator==(Book const& rhs) const;
+        bool operator!=(Book const& rhs) const;
 
         void printBookInfo() const;
         std::string isbnToString() const;
@@ -49,6 +52,7 @@ class Book
         bool checkOutBook(std::string person);
         ushort returnBook();
 
-        static void printByAuthor(std::string authorName, std::vector<Book> &bookList);
+        //Static methods
+        static void printByAuthor(std::string authorName, const std::vector<Book>& bookList);
         static std::string genreEToString(GenreE val); // could be usefull even wihout an instance
 };
