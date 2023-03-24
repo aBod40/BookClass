@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <string>
 #include <optional>
 #include <vector>
@@ -16,8 +15,7 @@ class Book
             biography,
             comicBook,
             lexicon,
-            novel,
-            unspecified
+            novel
         };
 
         const static unsigned short isbnSize = 13; // After 2007.
@@ -25,10 +23,11 @@ class Book
     private:
 
         ulong id = 0;
-        std::string tittle = "";
-        std::string author = "";
+        std::string title = "";
+        std::vector<std::string> authors;
         std::array<ushort, isbnSize> isbn = {0};
-        GenreE genre = GenreE::unspecified;
+        GenreE genre;
+        ushort loanPeriod = 1;
         bool checkedOut = false;
         std::optional<std::string> checkedOutToPerson = std::nullopt;
         std::optional<std::chrono::time_point<std::chrono::system_clock>> checkoutDate = std::nullopt;
@@ -36,16 +35,20 @@ class Book
     public:
         //Constructors
         Book() = delete;
-        Book(ulong id, std::string tittle, std::string author, std::array<ushort, 13>isbn, GenreE genre = GenreE::unspecified);
+        Book(ulong id, std::string title, std::string author, std::array<ushort, 13>isbn, GenreE genre, ushort loanPeriod = 10);
+        Book(ulong id, std::string title, std::vector<std::string> author, std::array<ushort, 13>isbn, GenreE genre, ushort loanPeriod = 10);
         Book(const Book&) = delete;
+        Book(Book&&) = default;
 
-        void operator=(const Book&) = delete;
+        Book& operator= (const Book&) = delete;
+        Book& operator= (Book&& ) = default;
 
         void printBookInfo() const;
         std::string isbnToString() const;
-        void checkOutBook(std::string person);
-        void returnBook();
+        std::string authorsToString() const;
+        bool checkOutBook(std::string person);
+        ushort returnBook();
 
-        static void printByAuthor(std::string authorName, std::vector<Book> bookList);
+        static void printByAuthor(std::string authorName, std::vector<Book> &bookList);
         static std::string genreEToString(GenreE val); // could be usefull even wihout an instance
 };
