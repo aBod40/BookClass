@@ -18,9 +18,12 @@ std::chrono::time_point<std::chrono::system_clock> LoanDetails::getExpectedRetur
     
     return checkoutDate + loanPeriod * 24h;
 }
-//unsigned LoanDetails::isOverdue () const
+int LoanDetails::daysOverdue () const
+{
+    return (floor<std::chrono::days>(std::chrono::system_clock::now() - getExpectedReturnDate())).count();
+}
 
-std::ostream& operator<<(std::ostream& stream,  std::chrono::time_point<std::chrono::system_clock> const & tp)
+std::ostream& operator<<(std::ostream& stream,  std::chrono::time_point<std::chrono::system_clock> const & tp)  // print date
 {
     using namespace std::chrono;
 
@@ -30,13 +33,12 @@ std::ostream& operator<<(std::ostream& stream,  std::chrono::time_point<std::chr
     return stream;
 }
 
-// Friends
 std::ostream& operator<<(std::ostream& stream, const LoanDetails& loanDetails)
 {
     stream
-    <<"Loan details :"<<std::endl
-    <<"  Name: "<<loanDetails.name<<std::endl
-    <<"  Checkout Date: "<<loanDetails.checkoutDate<<std::endl
+    <<"Loan details: "<<std::endl
+    <<"  Name: "<<loanDetails.getName()<<std::endl
+    <<"  Checkout Date: "<<loanDetails.getCheckoutDate()<<std::endl
     <<"  Expected Retrun Date: "<<loanDetails.getExpectedReturnDate()<<std::endl;
     
     return stream;

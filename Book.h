@@ -29,17 +29,14 @@ class Book
         std::vector<std::string> authors;
         std::array<unsigned, isbnSize> isbn = {0};
         GenreE genre;
-        unsigned loanPeriod = 10; // number of days; 0 signifies that a book is not to be checked out
-        bool checkedOut = false;
-        std::optional<std::string> checkedOutToPerson = std::nullopt;
-        std::optional<std::chrono::time_point<std::chrono::system_clock>> checkoutDate = std::nullopt;
+        unsigned loanPeriod = 7; // number of days; 0 signifies that a book is not to be checked out
         std::optional<LoanDetails> loanDetails = std::nullopt;
 
     public:
         //Constructors
         Book() = delete;
-        Book(unsigned long id, std::string title, std::string author, std::array<unsigned, 13>isbn, GenreE genre, unsigned loanPeriod = 10);
-        Book(unsigned long id, std::string title, std::vector<std::string> author, std::array<unsigned, 13>isbn, GenreE genre, unsigned loanPeriod = 10);
+        Book(unsigned long id, std::string title, std::string author, std::array<unsigned, 13>isbn, GenreE genre, unsigned loanPeriod = 7);
+        Book(unsigned long id, std::string title, std::vector<std::string> author, std::array<unsigned, 13>isbn, GenreE genre, unsigned loanPeriod = 7);
         Book(const Book&) = delete;
         Book(Book&&) = default;
 
@@ -53,7 +50,7 @@ class Book
         std::string isbnToString() const;
         std::string authorsToString() const;
         bool checkOutBook(std::string person);
-        unsigned returnBook();
+        int returnBook();
 
         // Setters
         void setLoanPeriod(unsigned val);
@@ -63,11 +60,13 @@ class Book
         std::string getTitle () const;
         uint numberOfAuthors () const;
         std::vector<std::string> getAuthors () const;
-        std::string getAuthor (uint n = 1) const;  // get the n-th author ( !!! zero-based indexing !!)
-        std::array<unsigned, isbnSize> gtIsbn () const;
+        std::string getAuthor (unsigned n = 0) const;  // get the (n-1)-th author ( !!! zero-based indexing !!)
+        uint getIsbnSize () const;  // In current implementation it must alway be the same
+        std::array<unsigned, isbnSize> getIsbn () const;
         GenreE getGenre () const;
         unsigned getLoanPeriod() const;
         bool isCheckedOut () const;
+        LoanDetails getLoanDetails () const;
 
         //Static methods
         static void printByAuthor(std::string authorName, const std::vector<Book>& bookList);

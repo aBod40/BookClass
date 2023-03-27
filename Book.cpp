@@ -12,23 +12,29 @@ Book::Book(unsigned long id, std::string title, std::vector<std::string> authors
 {
     if (id == 0)
     {
-        throw std::invalid_argument("Book id must be a value differen from 0");
+        throw std::invalid_argument("Book id must be a value differen from 0.");
     }
 
     if (title.empty())
     {
-        throw std::invalid_argument("Book title must be specified");
+        throw std::invalid_argument("Book title must be specified.");
     }
     
-    if (authors.empty() || authors[0].empty())  // First author can not be an empty string, others can
+    if (authors.empty())
     {
-        throw std::invalid_argument("At least one author must be specified");
+        throw std::invalid_argument("Book must have at least one author.");
+    }
+    
+    auto authorsIt = std::find_if(authors.begin(), authors.end(), [] (const auto& element) { return element.empty(); } );
+    if (authorsIt != authors.end())
+    {
+        throw std::invalid_argument("Every specified author must be a non-empty string.");
     }
     
     auto isbnIt = std::find_if(isbn.begin(), isbn.end(), [] (const auto& element) { return (element < 0 || element > 9); } );
     if (isbnIt != isbn.end())
     {
-        throw std::invalid_argument("Non (single) digit element detected in isbn");
+        throw std::invalid_argument("Non (single) digit element detected in isbn.");
     }
 }
 
@@ -46,34 +52,35 @@ void Book::printBookInfo() const
     <<"Book Id: "<<id<<std::endl
     <<"Title: \""<<title<<"\""<<std::endl
     <<"Authors: "<<authorsToString()<<std::endl
-    <<"ISBN: "<<isbnToString()<<std::endl
+    <<"ISBN("<<getIsbnSize()<<"): "<<isbnToString()<<std::endl
     <<"Genre: "<<Book::genreEToString(genre)<<std::endl
+    <<"Loan period: "<<loanPeriod<<" days"<<std::endl
     <<loanDetails
     <<std::endl<<std::endl;
 }
 
 bool Book::checkOutBook(std::string person)
 {
-    if (!checkedOut && loanPeriod > 0 && !person.empty())
+    if (!isCheckedOut() && loanPeriod > 0 && !person.empty())
     {
         loanDetails = LoanDetails(person, loanPeriod);
+
         return true;
     }
     return false;
 }
 
-unsigned Book::returnBook()
+int Book::returnBook()
 {
     using namespace std::literals;
     using namespace std::chrono;
 
-    if (checkedOut)
+    if (isCheckedOut())
     {
-        auto d = floor<days>( system_clock::now() - ( checkoutDate.value() + loanPeriod * 24h ) );
-     std::cout<<"D = "<<d.count()<<"\n";
+        auto d = loanDetails.value().daysOverdue();
         loanDetails.reset();
 
-        return d.count() > 0 ? d.count() : 0;
+        return d;
     }
     return 0;
 }
@@ -107,7 +114,7 @@ unsigned long Book::getId () const { return id; }
 std::string Book::getTitle () const { return title; }
 uint Book::numberOfAuthors () const { return authors.size(); }
 std::vector<std::string> Book::getAuthors () const { return authors; }
-std::string Book::getAuthor (uint n) const
+std::string Book::getAuthor (unsigned n) const
 {
     if ( authors.size() < n )
     {
@@ -115,10 +122,12 @@ std::string Book::getAuthor (uint n) const
     }
     return authors[n];
 }
-std::array<unsigned, Book::isbnSize> Book::gtIsbn () const { return isbn; }
+uint Book::getIsbnSize () const { return Book::isbnSize; }  
+std::array<unsigned, Book::isbnSize> Book::getIsbn () const { return isbn; }
 Book::GenreE Book::getGenre () const { return genre; }
 unsigned Book::getLoanPeriod() const { return loanPeriod; }
 bool Book::isCheckedOut () const { return loanDetails.has_value(); }
+LoanDetails Book::getLoanDetails () const { return loanDetails.value(); }
 
 void Book::printByAuthor(std::string authorName, const std::vector<Book>& bookList)
 {
