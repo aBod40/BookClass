@@ -24,7 +24,7 @@ Book::Book(unsigned long id, std::string title, std::vector<std::string> authors
     {
         throw std::invalid_argument("Book must have at least one author.");
     }
-    
+
     auto authorsIt = std::find_if(authors.begin(), authors.end(), [] (const auto& element) { return element.empty(); } );
     if (authorsIt != authors.end())
     {
