@@ -4,32 +4,10 @@
 #include <algorithm>
 #include <ranges>
 
-Book::Book(ulong id, std::string title, std::string author, std::array<ushort, Book::isbnSize>isbn, GenreE genre, ushort loanPeriod):
-    id(id), title(title), authors(1, author), isbn(isbn), genre(genre), loanPeriod(loanPeriod)
-{
-    if (id == 0)
-    {
-        throw std::invalid_argument("Book id must be a value differen from 0");
-    }
+Book::Book(unsigned long id, std::string title, std::string author, std::array<unsigned, Book::isbnSize>isbn, GenreE genre, unsigned loanPeriod):
+    Book::Book(id, title, std::vector<std::string>(1, author), isbn, genre, loanPeriod) {}
 
-    if (title.empty())
-    {
-        throw std::invalid_argument("Book title must be specified");
-    }
-
-    if (author.empty())
-    {
-        throw std::invalid_argument("Author must be specified");
-    }
-    
-    auto it = std::find_if(isbn.begin(), isbn.end(), [] (const ushort& element) { return (element < 0 || element > 9); } );
-    if (it != isbn.end())
-    {
-        throw std::invalid_argument("Non (single) digit element detected in isbn");
-    }
-}
-
-Book::Book(ulong id, std::string title, std::vector<std::string> authors, std::array<ushort, 13>isbn, GenreE genre, ushort loanPeriod):
+Book::Book(unsigned long id, std::string title, std::vector<std::string> authors, std::array<unsigned, 13>isbn, GenreE genre, unsigned loanPeriod):
     id(id), title(title), authors(authors), isbn(isbn), genre(genre), loanPeriod(loanPeriod)
 {
     if (id == 0)
@@ -47,8 +25,8 @@ Book::Book(ulong id, std::string title, std::vector<std::string> authors, std::a
         throw std::invalid_argument("At least one author must be specified");
     }
     
-    auto it = std::find_if(isbn.begin(), isbn.end(), [] (const ushort& element) { return (element < 0 || element > 9); } );
-    if (it != isbn.end())
+    auto isbnIt = std::find_if(isbn.begin(), isbn.end(), [] (const auto& element) { return (element < 0 || element > 9); } );
+    if (isbnIt != isbn.end())
     {
         throw std::invalid_argument("Non (single) digit element detected in isbn");
     }
@@ -57,10 +35,9 @@ Book::Book(ulong id, std::string title, std::vector<std::string> authors, std::a
 bool Book::operator==(Book const& rhs) const { return id == rhs.id; }
 bool Book::operator!=(Book const& rhs) const { return id != rhs.id; }
 
-template<typename T>
-std::ostream& operator<<(std::ostream& os, std::optional<T> const& opt)
+std::ostream& operator<<(std::ostream& os, std::optional<LoanDetails> const& opt)
 {
-    return opt ? os << opt.value() : os;
+    return opt ? os<<opt.value() : os<<"  Book is not checked out";
 }
 
 void Book::printBookInfo() const
@@ -71,35 +48,30 @@ void Book::printBookInfo() const
     <<"Authors: "<<authorsToString()<<std::endl
     <<"ISBN: "<<isbnToString()<<std::endl
     <<"Genre: "<<Book::genreEToString(genre)<<std::endl
-    <<"Checked out: "<<(checkedOut ? "Book is currently checkedout:" : "Book is currently not checkedout")<<std::endl
-    <<"Checkedout to: "<<checkedOutToPerson.value_or("none")<<std::endl<<std::endl;
+    <<loanDetails
+    <<std::endl<<std::endl;
 }
 
 bool Book::checkOutBook(std::string person)
 {
-    if (!checkedOut && loanPeriod > 0)
+    if (!checkedOut && loanPeriod > 0 && !person.empty())
     {
-        checkedOut = true;
-        checkedOutToPerson = person;
-        checkoutDate = std::chrono::system_clock::now();
-
+        loanDetails = LoanDetails(person, loanPeriod);
         return true;
     }
     return false;
 }
 
-ushort Book::returnBook()
+unsigned Book::returnBook()
 {
     using namespace std::literals;
     using namespace std::chrono;
- 
+
     if (checkedOut)
     {
         auto d = floor<days>( system_clock::now() - ( checkoutDate.value() + loanPeriod * 24h ) );
      std::cout<<"D = "<<d.count()<<"\n";
-        checkedOut = false;
-        checkedOutToPerson = std::nullopt;
-        checkoutDate = std::nullopt;
+        loanDetails.reset();
 
         return d.count() > 0 ? d.count() : 0;
     }
@@ -109,7 +81,7 @@ ushort Book::returnBook()
 std::string Book::isbnToString() const
 {
     std::string retVal;
-    for(auto i : isbn)
+    for(auto const & i : isbn)
     {
         retVal.push_back(i + '0');
     }
@@ -119,13 +91,34 @@ std::string Book::isbnToString() const
 std::string Book::authorsToString() const
 {
     std::string retVal;
-    for(auto author : authors)
+    for(auto const & author : authors)
     {
         retVal += (author);
         retVal += (", ");
     }
     return retVal;
 }
+
+//Setters
+void Book::setLoanPeriod(unsigned val) { loanPeriod = val; }
+
+// Getters
+unsigned long Book::getId () const { return id; }
+std::string Book::getTitle () const { return title; }
+uint Book::numberOfAuthors () const { return authors.size(); }
+std::vector<std::string> Book::getAuthors () const { return authors; }
+std::string Book::getAuthor (uint n) const
+{
+    if ( authors.size() < n )
+    {
+        return "";
+    }
+    return authors[n];
+}
+std::array<unsigned, Book::isbnSize> Book::gtIsbn () const { return isbn; }
+Book::GenreE Book::getGenre () const { return genre; }
+unsigned Book::getLoanPeriod() const { return loanPeriod; }
+bool Book::isCheckedOut () const { return loanDetails.has_value(); }
 
 void Book::printByAuthor(std::string authorName, const std::vector<Book>& bookList)
 {
@@ -146,7 +139,7 @@ void Book::printByAuthor(std::string authorName, const std::vector<Book>& bookLi
     else
     {
         std::cout<<"Books by "<<authorName<<": "<<std::endl;
-        for (const auto & bookByAuthor : matchingAuthor)
+        for (auto const & bookByAuthor : matchingAuthor)
         {
             bookByAuthor.printBookInfo();
         }

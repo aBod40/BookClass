@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "Book.h"
+#include "LoanDetails.h"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ int main()
         b3.printBookInfo();
         b4.printBookInfo();
         b5.printBookInfo();
+        b6.printBookInfo();
         cout<<endl<<endl;
 
         cout<<"Comparison operators demo:"<<endl;
@@ -51,21 +53,21 @@ int main()
         {
             cout<<"Checked out:"<<endl;
             b1.printBookInfo();
-        }
+        }   
         else
         {
             cout<<"Book couldn't be checked out"<<endl;
             b1.printBookInfo();
         }
 
-        ushort overdue = b1.returnBook();
+        unsigned overdue = b1.returnBook();
         cout<<"Book returned"<<endl;
         b1.printBookInfo();
         if (overdue)
         {
             cout<<"Late by "<<overdue<<" days!!"<<endl;
         }
-        
+
         if (b1.checkOutBook("James Camera"))
         {
             cout<<"Checked out:"<<endl;
@@ -77,7 +79,6 @@ int main()
             b1.printBookInfo();
         }
         cout<<endl<<endl;
-
         cout<<"Print all books by a given atuhor: "<<endl;
         vector<Book> bookList;
         bookList.push_back(std::move(b1));  // since not copyable, the books must be moved
