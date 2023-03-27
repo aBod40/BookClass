@@ -53,7 +53,7 @@ int main()
         }
 
         b1.setLoanPeriod(3);    // Loan period for the book changes while it's checked out - the expectedReturn date for the LoanDetails remains the same
-        if (b1.isCheckedOut()) 
+        if (b1.isCheckedOut())
         {
             cout<<"For the book \""<<b1.getTitle()<<"\" (id = "<<b1.getId()<<", ISBN = "<<b1.isbnToString()<<") (the new) loan period is "
             <<b1.getLoanPeriod()<<" days."<<endl;
@@ -76,7 +76,7 @@ int main()
         cout<<"Book returned; days left: "<< (overdue * -1)<<endl;
         b1.printBookInfo();
 
-        if (b1.checkOutBook("James Camera"))    // Now that the book has been returned, James can get to it 
+        if (b1.checkOutBook("James Camera"))    // Now that the book has been returned, James can get to it
                                                 // (but now only for 3 days, since the loan period has been chenged)
         {
             cout<<"Checked out:"<<endl;
@@ -92,7 +92,7 @@ int main()
 
         cout<<"Get LoanDetails demo: "<<endl;
         // bad practice
-        try 
+        try
         {
             b6.getLoanDetails(); // book not checked out, exception is thrown
         }
@@ -100,7 +100,7 @@ int main()
         {
             cerr << e.what() << endl;
         }
-        
+
         // good practice (extra safe would include try/catch despite the check)
         if (b6.isCheckedOut())
         {
@@ -110,7 +110,7 @@ int main()
         {
             cout<<"This book is not checked out: there are no loan details"<<endl;
         }
-        
+
         if (b1.isCheckedOut())
         {
             cout<<b1.getLoanDetails();
@@ -145,7 +145,6 @@ int main()
 
         cout<<"Faulty book initialization demo: "<<endl;
         Book bFaultyInit1(657183, "Die Leiden des jungen Werther", {"Johann Wolfgang von Goethe", "", "Mistery Author Num3"}, {2,5,3,4,0,7,3,6,9,3,3,2,1}, Book::GenreE::novel);
-        
     }
     catch (const invalid_argument& e)
     {

@@ -30,7 +30,7 @@ Book::Book(unsigned long id, std::string title, std::vector<std::string> authors
     {
         throw std::invalid_argument("Every specified author must be a non-empty string.");
     }
-    
+
     auto isbnIt = std::find_if(isbn.begin(), isbn.end(), [] (const auto& element) { return (element < 0 || element > 9); } );
     if (isbnIt != isbn.end())
     {
@@ -122,7 +122,7 @@ std::string Book::getAuthor (unsigned n) const
     }
     return authors[n];
 }
-uint Book::getIsbnSize () const { return Book::isbnSize; }  
+uint Book::getIsbnSize () const { return Book::isbnSize; }
 std::array<unsigned, Book::isbnSize> Book::getIsbn () const { return isbn; }
 Book::GenreE Book::getGenre () const { return genre; }
 unsigned Book::getLoanPeriod() const { return loanPeriod; }
